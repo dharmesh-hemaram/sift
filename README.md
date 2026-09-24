@@ -1,16 +1,66 @@
-# Sift
+<p align="center">
+  <a href="https://github.com/dharmesh-hemaram/sift">
+    <img src="src/icons/icon128.png" alt="Sift logo" width="96" height="96">
+  </a>
+</p>
 
-**Filter, map, and combine API response data right inside Chrome DevTools — no code required.**
+<h3 align="center">Sift</h3>
 
-## The problem
+<p align="center">
+  Filter, map, and combine API response data right inside Chrome DevTools — no code required.
+  <br>
+  <a href="https://github.com/dharmesh-hemaram/sift/issues/new">Report bug</a>
+  ·
+  <a href="https://github.com/dharmesh-hemaram/sift/issues/new">Request feature</a>
+  ·
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
 
-When debugging APIs in DevTools, common tasks like "extract one field from every
-item in this array," "filter this list by a status," or "join two responses on a
-shared key" all require the same workaround today: right-click a response →
-"Store as global variable" → drop into Console → hand-write `.map()`/`.filter()`.
-It works, but it's typing the same handful of JS patterns over and over.
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+  <img src="https://img.shields.io/badge/manifest-v3-orange.svg" alt="Manifest V3">
+  <img src="https://img.shields.io/badge/TypeScript-strict-3178c6.svg" alt="TypeScript strict">
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome">
+</p>
 
-## What Sift does
+When debugging APIs in DevTools, common tasks like "extract one field from
+every item in this array," "filter this list by a status," or "join two
+responses on a shared key" all require the same workaround today:
+right-click a response → "Store as global variable" → drop into Console →
+hand-write `.map()`/`.filter()`. It works, but it's typing the same handful
+of JS patterns over and over. Sift adds a panel that does it by clicking
+instead.
+
+## Table of contents
+
+- [Quick start](#quick-start)
+- [What's included](#whats-included)
+- [How it works](#how-it-works)
+- [Bugs and feature requests](#bugs-and-feature-requests)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Versioning](#versioning)
+- [Creator](#creator)
+- [Copyright and license](#copyright-and-license)
+
+## Quick start
+
+Not yet on the Chrome Web Store — for now, build and load it unpacked:
+
+```bash
+git clone https://github.com/dharmesh-hemaram/sift.git
+cd sift
+npm install && npm run build
+```
+
+Then:
+
+1. Open `chrome://extensions` and turn on **Developer mode**
+2. Click **Load unpacked** and select the `dist/` folder
+3. Open DevTools on any page that makes JSON API calls and find the **Sift**
+   tab, next to Elements/Console/Network
+
+## What's included
 
 - **Auto-captures every JSON response** DevTools sees — no setup, just open the panel
 - **Builds a chain of operations by clicking, not typing**: extract fields,
@@ -30,16 +80,6 @@ It works, but it's typing the same handful of JS patterns over and over.
 - **Runs 100% locally** — no network permissions, no telemetry, no analytics,
   nothing to trust beyond reading the source
 
-## Install
-
-Not yet on the Chrome Web Store — for now, load it unpacked:
-
-1. Clone this repo, then run `npm install && npm run build`
-2. Open `chrome://extensions` and turn on **Developer mode**
-3. Click **Load unpacked** and select the `dist/` folder
-4. Open DevTools on any page that makes JSON API calls and find the **Sift**
-   tab, next to Elements/Console/Network
-
 ## How it works
 
 1. Open the **Sift** tab and reload the page (or trigger some API calls) —
@@ -53,30 +93,45 @@ Not yet on the Chrome Web Store — for now, load it unpacked:
 5. Happy with a pipeline? **Export** it to a JSON file — a teammate can
    **Import** it against their own capture of the same endpoint.
 
-## Open source
+## Bugs and feature requests
 
-Sift is MIT-licensed and free to fork, modify, and build on. It's a
-standalone tool, not tied to any one employer's internal APIs — released the
-same way as [Auto Clicker – Auto Fill](https://getautoclicker.com), so it
-stays portable, personally owned, and useful to anyone pointing it at their
-own APIs.
+Have a bug or a feature request? Please first
+[search for existing and closed issues](https://github.com/dharmesh-hemaram/sift/issues).
+If your problem or idea isn't addressed yet,
+[open a new issue](https://github.com/dharmesh-hemaram/sift/issues/new).
 
-Pre-1.0 and actively developed — [PLAN.md](PLAN.md) and [SPEC.md](SPEC.md)
-have the detailed build log and open design questions, if you're curious.
+## Documentation
+
+There's no separate docs site — the repo doubles as the spec:
+
+- [SPEC.md](SPEC.md) — the full functional spec, including what's still
+  explicitly undecided
+- [PLAN.md](PLAN.md) — build sequence and detailed build log, phase by phase
 
 ## Contributing
 
 Bug reports and PRs are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for
-dev setup, tests, and the ground rules. Participation is governed by the
-[Code of Conduct](CODE_OF_CONDUCT.md).
+dev setup, tests, and the ground rules (there's exactly one hard rule).
+Participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## Security
+## Versioning
 
-See [SECURITY.md](SECURITY.md) — short version: this extension has no
-network permissions and makes no network calls of its own, so most classic
-web vulnerability classes don't apply, but responsible disclosure is still
-welcome for anything that does.
+Sift follows [Semantic Versioning](https://semver.org/) once it hits 1.0.
+Until then (currently `0.x`), breaking changes can land in a minor bump.
 
-## License
+## Creator
 
-[MIT](LICENSE)
+**Dharmesh Hemaram**
+
+- <https://github.com/dharmesh-hemaram>
+
+Built as a standalone tool, not tied to any one employer's internal APIs —
+released the same way as
+[Auto Clicker – Auto Fill](https://getautoclicker.com), so it stays
+portable, personally owned, and useful to anyone pointing it at their own
+APIs.
+
+## Copyright and license
+
+Code released under the [MIT License](LICENSE). See [SECURITY.md](SECURITY.md)
+for the trust model and how to report a vulnerability.
