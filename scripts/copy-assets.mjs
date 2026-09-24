@@ -1,7 +1,7 @@
 // Copies everything tsc/sass don't produce (manifest, html, icons) into
 // dist/ alongside the compiled JS/CSS, so dist/ is a complete, loadable
 // unpacked-extension directory.
-import { cpSync, mkdirSync } from "node:fs";
+import { cpSync, mkdirSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -10,6 +10,10 @@ const srcDir = path.join(rootDir, "src");
 const distDir = path.join(rootDir, "dist");
 
 const assets = ["manifest.json", "devtools.html", "panel.html", "sandbox.html", "icons"];
+
+// cpSync merges rather than mirrors — without this, a file removed from
+// src/icons/ would silently linger in dist/icons/ across rebuilds.
+for (const asset of assets) rmSync(path.join(distDir, asset), { recursive: true, force: true });
 
 mkdirSync(distDir, { recursive: true });
 for (const asset of assets) {

@@ -1,1 +1,1 @@
-chrome.devtools.panels.create("Sift", "icons/icon.png", "panel.html");
+chrome.devtools.panels.create("Sift", "icons/icon16.png", "panel.html");
