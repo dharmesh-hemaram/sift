@@ -1,0 +1,17 @@
+{
+  "name": "sift",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Filter, map, and combine API response data inline in Chrome DevTools — no code required.",
+  "license": "MIT",
+  "scripts": {
+    "test:unit": "node --test test/unit/*.test.js",
+    "test:e2e": "playwright test",
+    "test": "npm run test:unit && npm run test:e2e",
+    "lint": "echo \"no lint configured yet\" && exit 0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}
