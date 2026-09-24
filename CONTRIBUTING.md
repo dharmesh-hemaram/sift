@@ -4,6 +4,9 @@ Thanks for considering it. Sift is a small, single-maintainer project, so
 please open an issue to discuss anything non-trivial before sending a PR —
 it saves both of us time if the approach needs to change.
 
+Participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md) —
+please read it before opening an issue or PR.
+
 ## Before you start
 
 Read [README.md](README.md) for what/why, [SPEC.md](SPEC.md) for the
@@ -41,9 +44,28 @@ Then load `dist/` as an unpacked extension: `chrome://extensions` → enable
 Developer mode → **Load unpacked** → select `dist/`. Reload the extension
 after every `npm run build` to pick up changes.
 
-See README.md's **Architecture** section for how `src/` is organized before
-touching anything — it's a deliberate split (state / actions / capture /
-persistence / sandbox bridge / render / ui), not an accident.
+## Architecture
+
+`src/` is TypeScript, one file per concern — read this before touching
+anything, it's a deliberate split, not an accident:
+
+- `lib/*.ts` — pure logic (the operations catalog, pipeline engine, combine
+  engine, storage, export/import, formatting). No DOM, no `chrome.*` — this
+  is what `test/unit/` exercises directly.
+- `state.ts` — the single mutable app-state object.
+- `actions.ts` — mutations that need persistence/re-render side effects
+  (the "controller" layer between UI events and state).
+- `capture.ts`, `persistence.ts`, `sandboxBridge.ts` — the three integration
+  points with the outside world (`chrome.devtools.network`,
+  `chrome.storage.local`, and the sandboxed custom-expression iframe).
+- `ui/*.ts` + `render.ts` — build and update the DOM. `render.ts` is the only
+  place that decides _when_ to redraw; `renderBus.ts` is a tiny pub/sub so
+  action/UI modules can trigger a redraw without an import cycle back into
+  `render.ts`.
+- `panel.ts` — the ~10-line composition root that wires the above together.
+
+Nothing here is bundled — the browser loads these as native ES modules, so
+the file-per-concern split costs nothing at runtime.
 
 ## Before opening a PR
 
