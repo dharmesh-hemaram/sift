@@ -84,6 +84,38 @@ until the previous one runs end-to-end.
 - WebSocket/event-stream capture and summarization. Separate track, not
   started until v1 above is validated.
 
+## Follow-ups (post Phase 6, not part of the original phase list)
+
+- **Manage sifts screen ✅ (2026-09-25).** A third rail-header toggle
+  ("Manage", alongside Combine) switches `#main` to a screen listing every
+  saved sift across all endpoints (not just the currently selected
+  response's) — name (editable), endpoint, step count, last updated, and
+  Open/Delete actions. Renaming reuses `storage.ts`'s existing `save()` with
+  the same steps and a new name; no new storage method needed. "Open" is
+  disabled when there's no currently-captured response for that endpoint,
+  since the single-response view needs sample data to run the sift against.
+- **User-facing terminology: "sift" not "pipeline" (2026-09-25).** Buttons,
+  labels, and error messages shown to the user say "sift" (Export sift,
+  Import sift, Manage sifts, the export filename `sift-<endpoint>.json`),
+  matching the product name. Internal code identifiers (`pipelineSteps`,
+  `PipelineRecord`, `lib/pipeline.ts`, `runPipeline`, the
+  `sift.pipelines.v1` storage key, etc.) were deliberately left alone — pure
+  internal-naming rename with no user-visible benefit, and a much bigger,
+  separate refactor if it's ever wanted.
+
+## Future ideas (not started — parking lot only, do not implement without discussion first)
+
+- **Response-match notifications/subscriptions.** Let a saved sift "watch"
+  future captures matching a condition and surface a notification when one
+  hits — e.g. "notify me if a POST to this endpoint comes back as a
+  failure." Sketch only: what the match condition looks like (status code?
+  a filter step evaluating truthy? something new?), where "subscribed"
+  sifts are shown, and how a notification is actually surfaced (a DevTools
+  panel badge, a `chrome.notifications` popup — which is a permission bump
+  and worth weighing against the "100% local, minimal permissions" trust
+  model) are all open. Raised by Dharmesh 2026-09-25; needs real design
+  before any of it gets built.
+
 ## Testing data note
 
 No production API access assumed for development. Use public APIs (GitHub

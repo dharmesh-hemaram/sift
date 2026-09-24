@@ -42,9 +42,15 @@ test("full journey: capture -> pipeline -> table/raw result -> export -> persist
   await expect(page.locator(".rail-item")).toHaveCount(1);
   await page.click(".rail-item");
 
-  // Phase 1: no pipeline steps yet -> raw formatted JSON of the response itself.
-  await expect(page.locator("#json-view")).toContainText('"code"');
+  // No steps yet -> Table/Raw is still available, defaulting to Table, not
+  // just a bare raw view (the raw captured response is a valid "result" too).
   await expect(page.locator(".step-chip")).toHaveCount(0);
+  await expect(page.locator(".result-tab")).toHaveCount(2);
+  await expect(page.locator(".result-tab.active")).toHaveText("Table");
+  await expect(page.locator(".result-table")).toContainText("A1");
+  await page.click(".result-tab:has-text('Raw')");
+  await expect(page.locator("#json-view")).toContainText('"code"');
+  await page.click(".result-tab:has-text('Table')"); // back to default before building steps below
 
   // --- Phase 2/3: build extract -> filter -> sort ---
   await page.selectOption(".add-step-select", "extract");
@@ -91,7 +97,7 @@ test("full journey: capture -> pipeline -> table/raw result -> export -> persist
   // --- Phase 5: export defaults to structure-only ---
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.locator("button", { hasText: "Export pipeline" }).click(),
+    page.locator("button", { hasText: "Export sift" }).click(),
   ]);
   const downloadPath = path.join(os.tmpdir(), `sift-export-${Date.now()}.json`);
   await download.saveAs(downloadPath);

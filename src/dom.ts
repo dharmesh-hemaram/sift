@@ -5,4 +5,5 @@ export const railList = document.getElementById("rail-list") as HTMLUListElement
 export const railCount = document.getElementById("rail-count") as HTMLSpanElement;
 export const clearBtn = document.getElementById("clear-btn") as HTMLButtonElement;
 export const combineToggleBtn = document.getElementById("combine-toggle-btn") as HTMLButtonElement;
+export const manageToggleBtn = document.getElementById("manage-toggle-btn") as HTMLButtonElement;
 export const main = document.getElementById("main") as HTMLElement;

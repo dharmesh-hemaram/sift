@@ -1,12 +1,13 @@
 import { state } from "../state.ts";
-import { railList, railCount, clearBtn, combineToggleBtn } from "../dom.ts";
-import { selectResponse, clearAll, toggleCombineMode } from "../actions.ts";
+import { railList, railCount, clearBtn, combineToggleBtn, manageToggleBtn } from "../dom.ts";
+import { selectResponse, clearAll, toggleCombineMode, toggleManageMode } from "../actions.ts";
 import { formatBytes, urlSlug } from "../lib/format.ts";
 
 // Static listeners on the rail's own controls — called once at startup.
 export function initRail(): void {
   clearBtn.addEventListener("click", clearAll);
   combineToggleBtn.addEventListener("click", toggleCombineMode);
+  manageToggleBtn.addEventListener("click", toggleManageMode);
 }
 
 // Rebuilds the captured-response list. Same idea as DevTools' Network tab:
@@ -14,6 +15,7 @@ export function initRail(): void {
 export function renderRail(): void {
   railCount.textContent = String(state.capturedResponses.length);
   combineToggleBtn.classList.toggle("active", state.viewMode === "combine");
+  manageToggleBtn.classList.toggle("active", state.viewMode === "manage");
   railList.innerHTML = "";
 
   for (const entry of state.capturedResponses) {

@@ -1,4 +1,5 @@
 import { escapeHtml, highlightJson } from "../lib/format.ts";
+import { flattenObject } from "../lib/ops.ts";
 
 export function renderRawView(data: unknown): HTMLElement {
   let pretty: string;
@@ -51,6 +52,59 @@ function cellText(value: unknown): string {
   return String(value);
 }
 
+interface HeaderNode {
+  label: string;
+  path?: string;
+  children: HeaderNode[];
+}
+
+function buildGroupedHeader(headers: string[]): { thead: HTMLTableSectionElement; leafHeaders: string[] } {
+  const root: HeaderNode = { label: "", children: [] };
+
+  for (const header of headers) {
+    let parent = root;
+    for (const label of header.split(".")) {
+      let node = parent.children.find((child) => child.label === label);
+      if (!node) {
+        node = { label, children: [] };
+        parent.children.push(node);
+      }
+      parent = node;
+    }
+    parent.path = header;
+  }
+
+  const leafNodes: HeaderNode[] = [];
+  const collectLeaves = (node: HeaderNode): void => {
+    if (node.children.length === 0) {
+      leafNodes.push(node);
+      return;
+    }
+    node.children.forEach(collectLeaves);
+  };
+  root.children.forEach(collectLeaves);
+
+  const maxDepth = Math.max(...leafNodes.map((leaf) => leaf.path?.split(".").length ?? 1));
+  const rows = Array.from({ length: maxDepth }, () => document.createElement("tr"));
+  const appendNode = (node: HeaderNode, depth: number): number => {
+    const descendantCount = node.children.length
+      ? node.children.reduce((count, child) => count + appendNode(child, depth + 1), 0)
+      : 1;
+    const th = document.createElement("th");
+    th.textContent = node.label;
+    if (node.children.length) th.colSpan = descendantCount;
+    else th.rowSpan = maxDepth - depth;
+    rows[depth]!.appendChild(th);
+    return descendantCount;
+  };
+
+  root.children.forEach((node) => appendNode(node, 0));
+
+  const thead = document.createElement("thead");
+  rows.forEach((row) => thead.appendChild(row));
+  return { thead, leafHeaders: leafNodes.map((leaf) => leaf.path ?? leaf.label) };
+}
+
 export function renderTable(data: unknown): HTMLElement {
   if (Array.isArray(data)) {
     if (data.length === 0) {
@@ -64,16 +118,21 @@ export function renderTable(data: unknown): HTMLElement {
     table.className = "result-table";
 
     if (objectRows) {
-      const rows = data as Record<string, unknown>[];
-      const headers = [...new Set(rows.flatMap((row) => Object.keys(row)))];
-      const thead = document.createElement("thead");
-      thead.innerHTML = `<tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr>`;
+      // Nested objects (e.g. a user's `address`) split into their own
+      // dot-path columns (`address.street`, `address.geo.lat`, ...) instead
+      // of dumping the whole nested object into one cell as a JSON blob.
+      // flattenObject recurses as deep as the data actually is — no
+      // artificial depth cap — but leaves arrays alone (no fixed shape to
+      // make columns out of), so those still render as a single JSON cell.
+      const flatRows = (data as Record<string, unknown>[]).map((row) => flattenObject(row));
+      const headers = [...new Set(flatRows.flatMap((row) => Object.keys(row)))];
+      const { thead, leafHeaders } = buildGroupedHeader(headers);
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
-      for (const row of rows) {
+      for (const row of flatRows) {
         const tr = document.createElement("tr");
-        tr.innerHTML = headers.map((h) => `<td>${escapeHtml(cellText(row[h]))}</td>`).join("");
+        tr.innerHTML = leafHeaders.map((h) => `<td>${escapeHtml(cellText(row[h]))}</td>`).join("");
         tbody.appendChild(tr);
       }
       table.appendChild(tbody);
@@ -86,9 +145,10 @@ export function renderTable(data: unknown): HTMLElement {
   }
 
   if (data !== null && typeof data === "object") {
+    const flat = flattenObject(data as Record<string, unknown>);
     const table = document.createElement("table");
     table.className = "result-table";
-    table.innerHTML = `<thead><tr><th>key</th><th>value</th></tr></thead><tbody>${Object.entries(data)
+    table.innerHTML = `<thead><tr><th>key</th><th>value</th></tr></thead><tbody>${Object.entries(flat)
       .map(([k, v]) => `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(cellText(v))}</td></tr>`)
       .join("")}</tbody>`;
     return table;

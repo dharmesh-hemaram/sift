@@ -6,43 +6,47 @@ import type { DevToolsRequestLike } from "./types.ts";
 
 let nextId = 1;
 
+// Shared by the real chrome.devtools.network listener below and the manual
+// dev-capture panel (ui/devCapture.ts) — same validation, same push. Returns
+// false (and adds nothing) if `content` isn't valid JSON.
+export function captureResponse(url: string, content: string, status = 200): boolean {
+  if (!content) return false;
+  try {
+    JSON.parse(content);
+  } catch {
+    return false; // Not JSON, or malformed JSON — ignored for v1 (SPEC.md §1).
+  }
+
+  state.capturedResponses.push({
+    id: nextId++,
+    url,
+    urlPattern: normalizeUrlPattern(url),
+    status,
+    size: content.length,
+    time: new Date().toISOString(),
+    content,
+  });
+  scheduleRender();
+  return true;
+}
+
 function handleRequestFinished(request: DevToolsRequestLike): void {
-  const mimeType = request.response?.content?.mimeType ?? "";
-  const looksJson = mimeType.includes("json");
-
   request.getContent((content) => {
-    if (!content) return;
-    try {
-      JSON.parse(content);
-    } catch {
-      if (looksJson) return; // Content-Type said JSON but body wasn't parseable.
-      return; // Not JSON at all — ignored for v1 (SPEC.md §1).
-    }
-
-    state.capturedResponses.push({
-      id: nextId++,
-      url: request.request.url,
-      urlPattern: normalizeUrlPattern(request.request.url),
-      status: request.response.status,
-      size: content.length,
-      time: new Date().toISOString(),
-      content,
-    });
-
-    scheduleRender();
+    captureResponse(request.request.url, content, request.response.status);
   });
 }
 
 // chrome.devtools.network is only available when this page is hosted by a
-// real, open DevTools window. When it's missing (e.g. panel.html opened
-// directly, as Playwright e2e tests do — there is no way to script the
-// actual DevTools UI itself, see test/e2e/README.md) we expose the same
-// handler as a test hook instead of crashing, so the real capture/render
-// code path still runs end to end in a real browser.
-const networkSource = typeof chrome !== "undefined" ? chrome.devtools?.network : undefined;
+// real, open DevTools window. When it's missing — panel.html opened
+// directly for local testing (see README's Quick start), or Playwright e2e
+// tests, since there's no way to script the actual DevTools UI itself, see
+// test/e2e/README.md — we still want the rest of the app to work: expose
+// the same handler as a test hook, and let ui/devCapture.ts show a manual
+// "add a response" form instead of the panel just sitting empty forever.
+export const hasDevToolsHost = typeof chrome !== "undefined" && Boolean(chrome.devtools?.network);
 
-if (networkSource) {
-  networkSource.onRequestFinished.addListener(handleRequestFinished as never);
+if (hasDevToolsHost) {
+  chrome.devtools.network.onRequestFinished.addListener(handleRequestFinished as never);
 } else {
   window.__sift = { handleRequestFinished };
 }

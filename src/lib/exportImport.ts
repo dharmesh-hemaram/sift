@@ -61,7 +61,7 @@ export function parseImport(jsonText: string): PipelineRecord[] {
   const list = (Array.isArray(data) ? data : [data]) as PipelineRecord[];
   for (const p of list) {
     if (!p || typeof p !== "object" || !p.urlPattern || !Array.isArray(p.steps)) {
-      throw new Error("Not a valid Sift pipeline export: expected { urlPattern, steps }");
+      throw new Error("Not a valid Sift export: expected { urlPattern, steps }");
     }
   }
   return list;

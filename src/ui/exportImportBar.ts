@@ -21,14 +21,14 @@ export function renderExportImportBar(entry: CapturedResponse): HTMLElement {
   sampleLabel.append(sampleCheckbox, " Include sample result (may contain real API data)");
 
   const exportBtn = document.createElement("button");
-  exportBtn.textContent = "Export pipeline";
+  exportBtn.textContent = "Export sift";
   exportBtn.disabled = state.pipelineSteps.length === 0;
   exportBtn.addEventListener("click", () => {
     void exportCurrentPipeline(entry);
   });
 
   const importBtn = document.createElement("button");
-  importBtn.textContent = "Import pipeline";
+  importBtn.textContent = "Import sift";
   const importInput = document.createElement("input");
   importInput.type = "file";
   importInput.accept = "application/json";
@@ -75,7 +75,7 @@ async function exportCurrentPipeline(entry: CapturedResponse): Promise<void> {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `sift-pipeline-${entry.urlPattern.replace(/[^a-z0-9]+/gi, "-")}.json`;
+  a.download = `sift-${entry.urlPattern.replace(/[^a-z0-9]+/gi, "-")}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }

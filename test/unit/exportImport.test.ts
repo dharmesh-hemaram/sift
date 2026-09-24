@@ -38,7 +38,7 @@ test("buildExport accepts an array of pipelines", () => {
 test("parseImport accepts a single object or an array, rejects malformed input", () => {
   assert.equal(parseImport(JSON.stringify(pipeline)).length, 1);
   assert.equal(parseImport(JSON.stringify([pipeline, pipeline])).length, 2);
-  assert.throws(() => parseImport(JSON.stringify({ notAPipeline: true })), /Not a valid Sift pipeline export/);
+  assert.throws(() => parseImport(JSON.stringify({ notAPipeline: true })), /Not a valid Sift export/);
   assert.throws(() => parseImport("{not json"));
 });
 

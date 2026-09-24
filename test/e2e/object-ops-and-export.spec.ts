@@ -69,7 +69,7 @@ test("export: sample result is only attached when explicitly opted in", async ({
   await page.locator("#include-sample-label input[type=checkbox]").check();
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.locator("button", { hasText: "Export pipeline" }).click(),
+    page.locator("button", { hasText: "Export sift" }).click(),
   ]);
   const downloadPath = path.join(os.tmpdir(), `sift-sample-export-${Date.now()}.json`);
   await download.saveAs(downloadPath);

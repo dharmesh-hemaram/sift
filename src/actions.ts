@@ -63,9 +63,20 @@ export function clearAll(): void {
   scheduleRender();
 }
 
-export function toggleCombineMode(): void {
-  state.viewMode = state.viewMode === "combine" ? "single" : "combine";
+// Shared toggle logic for the rail's "mode" buttons (Combine, Manage) —
+// clicking the active one goes back to the single-response view, clicking
+// the other one switches to it.
+function setViewMode(mode: "combine" | "manage"): void {
+  state.viewMode = state.viewMode === mode ? "single" : mode;
   scheduleRender();
+}
+
+export function toggleCombineMode(): void {
+  setViewMode("combine");
+}
+
+export function toggleManageMode(): void {
+  setViewMode("manage");
 }
 
 export function updatePipeline(mutate: (steps: PipelineStep[]) => PipelineStep[]): void {

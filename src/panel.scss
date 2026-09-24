@@ -80,6 +80,7 @@ body {
 }
 
 #combine-toggle-btn,
+#manage-toggle-btn,
 #clear-btn {
   font-size: $font-size-sm;
   padding: 2px 8px;
@@ -95,12 +96,13 @@ body {
 
 #combine-toggle-btn {
   margin-left: auto;
+}
 
-  &.active {
-    background: $color-accent;
-    border-color: $color-accent;
-    color: $color-bg;
-  }
+#combine-toggle-btn.active,
+#manage-toggle-btn.active {
+  background: $color-accent;
+  border-color: $color-accent;
+  color: $color-bg;
 }
 
 #rail-list {
@@ -555,4 +557,80 @@ body {
   color: $color-danger;
   font-size: $font-size-sm;
   flex-shrink: 0;
+}
+
+// -------------------------------------------------------------- manage view
+
+#manage-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 12px;
+  gap: 10px;
+}
+
+#manage-header {
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+#manage-empty {
+  color: $color-text-faint;
+  padding: 16px 0;
+}
+
+#manage-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: $font-size-sm;
+
+  th,
+  td {
+    border: 1px solid #eee;
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    background: $color-bg-subtler;
+  }
+}
+
+.manage-pattern {
+  font-family: $font-mono;
+  white-space: nowrap;
+}
+
+#manage-table input[type="text"] {
+  width: 100%;
+  font: inherit;
+  font-size: $font-size-sm;
+  padding: 3px 5px;
+  border: 1px solid $color-border-input;
+  border-radius: 4px;
+}
+
+.manage-actions {
+  white-space: nowrap;
+
+  button {
+    font-size: $font-size-sm;
+    padding: 2px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: $color-bg-subtle;
+    cursor: pointer;
+    margin-right: 4px;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  .manage-delete {
+    color: $color-danger;
+  }
 }

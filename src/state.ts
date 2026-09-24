@@ -13,7 +13,7 @@ export interface AppState {
   includeSampleOnExport: boolean;
   importError: string | null;
 
-  viewMode: "single" | "combine"; // see PLAN.md Phase 6
+  viewMode: "single" | "combine" | "manage"; // see PLAN.md Phase 6
   combineOperation: CombineOpId;
   combineInputs: CombineInputState[];
   combineResultViewMode: "table" | "raw";

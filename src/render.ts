@@ -7,6 +7,7 @@ import { state, selectedEntry, parsedData } from "./state.ts";
 import { setRender, setMainRender } from "./renderBus.ts";
 import { renderRail } from "./ui/rail.ts";
 import { renderCombineView } from "./ui/combineView.ts";
+import { renderManagePipelinesView } from "./ui/managePipelinesView.ts";
 import { renderSingleResponseView } from "./ui/pipelineView.ts";
 
 function buildEmptyState(text: string): HTMLElement {
@@ -28,6 +29,13 @@ async function renderMain(): Promise<void> {
 
   if (state.viewMode === "combine") {
     const view = renderCombineView();
+    if (token !== renderToken) return;
+    main.replaceChildren(view);
+    return;
+  }
+
+  if (state.viewMode === "manage") {
+    const view = await renderManagePipelinesView();
     if (token !== renderToken) return;
     main.replaceChildren(view);
     return;
