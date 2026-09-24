@@ -4,8 +4,8 @@
     {
       "name": "sift-panel-preview",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4173", "--directory", "src"],
-      "port": 4173
+      "runtimeArgs": ["-m", "http.server", "4174", "--directory", "src"],
+      "port": 4174
     }
   ]
 }
