@@ -6,12 +6,26 @@
   "description": "Filter, map, and combine API response data inline in Chrome DevTools — no code required.",
   "license": "MIT",
   "scripts": {
-    "test:unit": "node --test test/unit/*.test.js",
-    "test:e2e": "playwright test",
-    "test": "npm run test:unit && npm run test:e2e",
-    "lint": "echo \"no lint configured yet\" && exit 0"
+    "build:ts": "tsc",
+    "build:css": "sass src/panel.scss dist/panel.css --no-source-map",
+    "build:assets": "node scripts/copy-assets.mjs",
+    "build": "npm run build:ts && npm run build:css && npm run build:assets",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:unit": "node --test test/unit/*.test.ts",
+    "test:e2e": "npm run build && playwright test",
+    "test": "npm run test:unit && npm run test:e2e"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0"
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@types/chrome": "^0.3.0",
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
+    "sass": "^1.105.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.1"
   }
 }

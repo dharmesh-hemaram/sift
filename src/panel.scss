@@ -1,0 +1,558 @@
+// Color/spacing tokens — everything below reads from these instead of
+// repeating literals, so the palette can change in one place.
+$color-text: #1a1a1a;
+$color-text-muted: #666;
+$color-text-faint: #888;
+$color-bg: #fff;
+$color-bg-subtle: #f5f5f5;
+$color-bg-subtler: #f6f8fa;
+$color-border: #e0e0e0;
+$color-border-light: #f0f0f0;
+$color-border-input: #d0d7de;
+$color-accent: #8250df;
+$color-accent-bg: #faf8ff;
+$color-danger: #cf222e;
+$color-success: #1a7f37;
+$color-warning-bg: #fff8e6;
+$color-warning-border: #eac54f;
+$color-warning-text: #7d4e00;
+$color-selected-bg: #e3edff;
+$color-hover-bg: #f5f8ff;
+
+$font-mono: "SFMono-Regular", Consolas, monospace;
+$font-size-sm: 11px;
+$font-size-xs: 10px;
+
+// A section of #main that stacks above the content and doesn't shrink —
+// the pipeline bar, broken-step banner, export/import bar all share this.
+@mixin bottom-bordered-bar {
+  flex-shrink: 0;
+  border-bottom: 1px solid $color-border;
+}
+
+// The small text/icon buttons scattered through step chips, condition
+// rows, and combine input rows (×, ↑, ↓, remove).
+@mixin borderless-icon-button($color: $color-text-muted) {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: $color;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  color: $color-text;
+  background: $color-bg;
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+}
+
+#rail {
+  width: 320px;
+  flex-shrink: 0;
+  border-right: 1px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#rail-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid $color-border;
+  font-weight: 600;
+}
+
+#rail-count {
+  color: $color-text-muted;
+  font-weight: 400;
+}
+
+#combine-toggle-btn,
+#clear-btn {
+  font-size: $font-size-sm;
+  padding: 2px 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: $color-bg-subtle;
+  cursor: pointer;
+
+  &:hover {
+    background: #eaeaea;
+  }
+}
+
+#combine-toggle-btn {
+  margin-left: auto;
+
+  &.active {
+    background: $color-accent;
+    border-color: $color-accent;
+    color: $color-bg;
+  }
+}
+
+#rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.rail-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 10px;
+  border-bottom: 1px solid $color-border-light;
+  cursor: pointer;
+
+  &:hover {
+    background: $color-hover-bg;
+  }
+
+  &.selected {
+    background: $color-selected-bg;
+  }
+}
+
+.rail-item-name {
+  flex: 1;
+  min-width: 0;
+  font-family: $font-mono;
+  font-size: $font-size-sm;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rail-item-status,
+.rail-item-size {
+  flex-shrink: 0;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+}
+
+.status-ok {
+  color: $color-success;
+}
+
+.status-error {
+  color: $color-danger;
+}
+
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#empty-state {
+  margin: auto;
+  color: $color-text-faint;
+  padding: 24px;
+  text-align: center;
+}
+
+#json-view-header {
+  @include bottom-bordered-bar;
+  padding: 8px 12px;
+  font-family: $font-mono;
+  font-size: $font-size-sm;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#json-view {
+  flex: 1;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  font-family: $font-mono;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+}
+
+.json-key {
+  color: #953800;
+}
+
+.json-string {
+  color: #0a3069;
+}
+
+.json-number {
+  color: #0550ae;
+}
+
+.json-boolean,
+.json-null {
+  color: $color-accent;
+}
+
+// ---------------------------------------------------------- pipeline bar
+
+#pipeline-bar {
+  @include bottom-bordered-bar;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fafafa;
+}
+
+.step-chip {
+  border: 1px solid $color-border-input;
+  border-radius: 6px;
+  background: $color-bg;
+  min-width: 160px;
+  max-width: 260px;
+}
+
+.step-chip-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-bottom: 1px solid #eee;
+  background: $color-bg-subtler;
+  border-radius: 6px 6px 0 0;
+
+  button {
+    @include borderless-icon-button(#555);
+    font-size: $font-size-sm;
+    padding: 0 3px;
+
+    &:disabled {
+      color: #ccc;
+      cursor: default;
+    }
+  }
+}
+
+.step-chip-label {
+  flex: 1;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.step-chip-remove {
+  color: $color-danger !important;
+}
+
+.step-chip-params {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.param-control {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: $font-size-sm;
+}
+
+.param-label {
+  color: $color-text-muted;
+}
+
+.param-control input[type="text"],
+.param-control input[type="number"],
+.param-control select,
+.param-control textarea {
+  font: inherit;
+  font-size: $font-size-sm;
+  padding: 3px 5px;
+  border: 1px solid $color-border-input;
+  border-radius: 4px;
+}
+
+.code-input {
+  font-family: $font-mono;
+  min-height: 50px;
+  resize: vertical;
+}
+
+.key-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.key-pill {
+  font-size: $font-size-xs;
+  padding: 1px 6px;
+  border: 1px solid $color-border-input;
+  border-radius: 10px;
+  background: $color-bg-subtler;
+  cursor: pointer;
+
+  &:hover {
+    background: #eaeef2;
+  }
+}
+
+.conditions-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.condition-row {
+  display: flex;
+  gap: 4px;
+
+  input,
+  select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  button {
+    @include borderless-icon-button($color-danger);
+  }
+}
+
+.add-condition {
+  align-self: flex-start;
+  font-size: $font-size-sm;
+  border: 1px dashed $color-border-input;
+  background: transparent;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.add-step {
+  align-self: flex-start;
+}
+
+.add-step-select {
+  font-size: 12px;
+  padding: 6px 8px;
+  border: 1px dashed $color-accent;
+  border-radius: 6px;
+  background: $color-accent-bg;
+  color: $color-accent;
+  cursor: pointer;
+}
+
+// ------------------------------------------------------------ broken banner
+
+#broken-banner {
+  @include bottom-bordered-bar;
+  padding: 6px 12px;
+  background: $color-warning-bg;
+  border-bottom-color: $color-warning-border;
+  color: $color-warning-text;
+  font-size: $font-size-sm;
+}
+
+// --------------------------------------------------------- export/import
+
+#export-import-bar {
+  @include bottom-bordered-bar;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+
+  button {
+    font-size: $font-size-sm;
+    padding: 3px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: $color-bg-subtle;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+}
+
+#include-sample-label {
+  font-size: $font-size-sm;
+  color: $color-warning-text;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#import-error {
+  color: $color-danger;
+  font-size: $font-size-sm;
+}
+
+// -------------------------------------------------------------- result view
+
+#result-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#result-tabs {
+  flex-shrink: 0;
+  display: flex;
+  gap: 2px;
+  padding: 6px 12px 0;
+}
+
+.result-tab {
+  font-size: $font-size-sm;
+  padding: 4px 10px;
+  border: 1px solid $color-border;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background: $color-bg-subtle;
+  cursor: pointer;
+
+  &.active {
+    background: $color-bg;
+    font-weight: 600;
+  }
+}
+
+#result-body {
+  flex: 1;
+  overflow: auto;
+
+  #json-view {
+    height: 100%;
+  }
+}
+
+.result-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: $font-size-sm;
+
+  th,
+  td {
+    border: 1px solid #eee;
+    padding: 4px 8px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  th {
+    background: $color-bg-subtler;
+    position: sticky;
+    top: 0;
+  }
+}
+
+.table-empty {
+  padding: 16px;
+  color: $color-text-faint;
+}
+
+// ------------------------------------------------------------- combine view
+
+#combine-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 12px;
+  gap: 10px;
+
+  #result-view {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+#combine-header {
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+#combine-op-select {
+  align-self: flex-start;
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid $color-border-input;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+#combine-inputs {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.combine-input-row {
+  display: flex;
+  gap: 6px;
+
+  button {
+    @include borderless-icon-button($color-danger);
+  }
+}
+
+.combine-input-select {
+  flex: 1;
+  min-width: 0;
+  font-size: $font-size-sm;
+  padding: 4px 6px;
+  border: 1px solid $color-border-input;
+  border-radius: 4px;
+}
+
+.combine-input-row input[type="text"] {
+  width: 160px;
+  font-size: $font-size-sm;
+  padding: 4px 6px;
+  border: 1px solid $color-border-input;
+  border-radius: 4px;
+}
+
+.combine-nest-hint {
+  font-size: $font-size-xs;
+  color: $color-accent;
+  align-self: center;
+  white-space: nowrap;
+}
+
+#combine-add-input {
+  align-self: flex-start;
+  font-size: $font-size-sm;
+  border: 1px dashed $color-border-input;
+  background: transparent;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#combine-error {
+  color: $color-danger;
+  font-size: $font-size-sm;
+  flex-shrink: 0;
+}
