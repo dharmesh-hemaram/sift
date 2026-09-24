@@ -103,6 +103,19 @@ employer's internal APIs), released the same way as
 [Auto Clicker – Auto Fill](https://getautoclicker.com), so it stays portable,
 personally owned, and usable by anyone who wants to point it at their own APIs.
 
+## Contributing
+
+Bug reports and PRs are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for
+dev setup, tests, and the one hard rule (no visual join/connector UI without
+sign-off, see `PLAN.md` Phase 6).
+
+## Security
+
+See [SECURITY.md](SECURITY.md) — short version: this extension has no
+network permissions and makes no network calls of its own, so most classic
+web vulnerability classes don't apply, but responsible disclosure is still
+welcome for anything that does.
+
 ## License
 
-MIT (matches Auto Clicker's licensing — confirm before first release).
+[MIT](LICENSE) — matches Auto Clicker's licensing.
