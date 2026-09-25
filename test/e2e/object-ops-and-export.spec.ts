@@ -1,9 +1,6 @@
 import { test, expect } from "./fixtures.ts";
 import type { Page } from "@playwright/test";
 import type {} from "../../src/types.ts"; // pulls in the Window.__sift global augmentation
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
 
 async function capture(page: Page, { url, status = 200, body }: { url: string; status?: number; body: string }) {
   await page.evaluate(
@@ -52,29 +49,8 @@ test("single-object response: pick keys + custom expression escape hatch", async
   expect(raw).toEqual({ upper: "ADA" });
 });
 
-test("export: sample result is only attached when explicitly opted in", async ({ context, extensionId }) => {
-  const page = await context.newPage();
-  await page.goto(`chrome-extension://${extensionId}/panel.html`);
-
-  await capture(page, {
-    url: "https://api.example.com/api/v2/widgets",
-    body: JSON.stringify([{ id: 1, label: "one" }]),
-  });
-  await page.click(".rail-item");
-  await page.selectOption(".add-step-select", "extract");
-  const keysInput = page.locator(".step-chip").first().locator('input[type="text"]').first();
-  await keysInput.fill("id");
-  await keysInput.press("Tab");
-
-  await page.locator("#include-sample-label input[type=checkbox]").check();
-  const [download] = await Promise.all([
-    page.waitForEvent("download"),
-    page.locator("button", { hasText: "Export sift" }).click(),
-  ]);
-  const downloadPath = path.join(os.tmpdir(), `sift-sample-export-${Date.now()}.json`);
-  await download.saveAs(downloadPath);
-  const exported = JSON.parse(await fs.readFile(downloadPath, "utf8"));
-  await fs.unlink(downloadPath);
-
-  expect(exported[0].sampleResult).toEqual([{ id: 1 }]);
-});
+// Export's "sample result is only attached when explicitly opted in"
+// behavior is covered at the unit level (test/unit/exportImport.test.ts) —
+// the export/import bar was removed from this view (moving under the
+// Manage section) and no longer has a UI entry point here to drive an e2e
+// check through.

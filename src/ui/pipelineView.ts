@@ -6,7 +6,6 @@ import { validateImportedPipeline } from "../lib/exportImport.ts";
 import { escapeHtml } from "../lib/format.ts";
 import { pipelineHandlerOverrides } from "../sandboxBridge.ts";
 import { renderResultView } from "./resultView.ts";
-import { renderExportImportBar } from "./exportImportBar.ts";
 import { scheduleMainRender } from "../renderBus.ts";
 import type {
   CapturedResponse,
@@ -18,11 +17,11 @@ import type {
 } from "../types.ts";
 
 // Assembles the single-response view: header, pipeline bar, broken-step
-// banner (if any), export/import bar, and the Table/Raw result view (shown
-// from the start, even with zero steps — the raw captured response is just
-// as valid a "result" as any pipeline output). Async because building the
-// pipeline bar and running the pipeline both may call into the sandboxed
-// custom-expression evaluator.
+// banner (if any), and the Table/Raw result view (shown from the start,
+// even with zero steps — the raw captured response is just as valid a
+// "result" as any pipeline output). Async because building the pipeline bar
+// and running the pipeline both may call into the sandboxed custom-
+// expression evaluator.
 export async function renderSingleResponseView(entry: CapturedResponse, data: unknown): Promise<HTMLElement[]> {
   const header = document.createElement("div");
   header.id = "json-view-header";
@@ -33,7 +32,6 @@ export async function renderSingleResponseView(entry: CapturedResponse, data: un
   const { result, stepResults } = await runPipeline(data, state.pipelineSteps, pipelineHandlerOverrides);
   const validated = validateImportedPipeline({ steps: state.pipelineSteps, urlPattern: entry.urlPattern }, data);
   const brokenBanner = buildBrokenBanner(state.pipelineSteps, stepResults, validated.steps);
-  const exportImportBar = renderExportImportBar(entry);
   // With zero steps, runPipeline's result is just `data` unchanged — so this
   // always shows Table/Raw, even before any step is added, rather than only
   // offering the raw view until the first step exists.
@@ -44,7 +42,7 @@ export async function renderSingleResponseView(entry: CapturedResponse, data: un
 
   const children = [header, pipelineBar];
   if (brokenBanner) children.push(brokenBanner);
-  children.push(exportImportBar, resultNode);
+  children.push(resultNode);
   return children;
 }
 

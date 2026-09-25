@@ -2,9 +2,6 @@ import { test, expect } from "./fixtures.ts";
 import type { Page } from "@playwright/test";
 import type {} from "../../src/types.ts"; // pulls in the Window.__sift global augmentation
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
 
 const SAMPLE_URL = "https://api.example.com/api/v2/accounts/123";
 
@@ -30,7 +27,7 @@ const ACCOUNTS_JSON = JSON.stringify([
   { code: "A3", balance: 200, status: "active" },
 ]);
 
-test("full journey: capture -> pipeline -> table/raw result -> export -> persists across reload -> import flags a broken step", async ({
+test("full journey: capture -> pipeline -> table/raw result -> persists across reload", async ({
   context,
   extensionId,
 }) => {
@@ -94,18 +91,10 @@ test("full journey: capture -> pipeline -> table/raw result -> export -> persist
   const parsedRaw = JSON.parse(rawText);
   assertAccountCodesDescByBalance(parsedRaw);
 
-  // --- Phase 5: export defaults to structure-only ---
-  const [download] = await Promise.all([
-    page.waitForEvent("download"),
-    page.locator("button", { hasText: "Export sift" }).click(),
-  ]);
-  const downloadPath = path.join(os.tmpdir(), `sift-export-${Date.now()}.json`);
-  await download.saveAs(downloadPath);
-  const exported = JSON.parse(await fs.readFile(downloadPath, "utf8"));
-  expect(exported[0].urlPattern).toBe("/api/v2/accounts/:id");
-  expect(exported[0].steps).toHaveLength(3);
-  expect(exported[0]).not.toHaveProperty("sampleResult");
-  await fs.unlink(downloadPath);
+  // Export defaults to structure-only — covered at the unit level
+  // (test/unit/exportImport.test.ts). The export/import bar was removed
+  // from this view (moving under the Manage section) so there's no UI
+  // entry point here to drive that check through anymore.
 
   // --- Phase 4: persistence survives a panel reload (real chrome.storage.local) ---
   // Saves are debounced (300ms) so real edits aren't a storage write per keystroke;
@@ -120,26 +109,11 @@ test("full journey: capture -> pipeline -> table/raw result -> export -> persist
     // pipeline was actually reloaded from chrome.storage.local.
   });
 
-  // --- Phase 5: import flags a step referencing a key this response doesn't have ---
-  const brokenPipeline = [
-    {
-      id: "imported-1",
-      name: "Imported broken pipeline",
-      urlPattern: "/api/v2/accounts/:id",
-      steps: [{ op: "filter", conditions: [{ key: "region", operator: "=", value: "us" }] }],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ];
-  const importPath = path.join(os.tmpdir(), `sift-import-${Date.now()}.json`);
-  await fs.writeFile(importPath, JSON.stringify(brokenPipeline));
-  await page.locator('input[type="file"]').setInputFiles(importPath);
-  await fs.unlink(importPath);
-
-  await expect(page.locator("#broken-banner")).toContainText("key not found in this response");
-  await expect(page.locator("#broken-banner")).toContainText("region");
-  // The broken step stays visible (greyed via the banner) instead of being silently dropped.
-  await expect(page.locator(".step-chip")).toHaveCount(1);
+  // Import flagging a step referencing a missing key was previously driven
+  // through the export/import bar's file input, now removed from this view
+  // (moving under the Manage section). validateImportedPipeline's own
+  // broken-step detection is still covered at the unit level
+  // (test/unit/exportImport.test.ts).
 
   await page.close();
 });
