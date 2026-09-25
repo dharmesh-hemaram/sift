@@ -79,11 +79,11 @@ body {
   font-weight: 400;
 }
 
-#combine-toggle-btn,
-#manage-toggle-btn,
-#clear-btn {
+.icon-btn {
+  margin-left: auto;
   font-size: $font-size-sm;
-  padding: 2px 8px;
+  line-height: 1;
+  padding: 4px 6px;
   border: 1px solid #ccc;
   border-radius: 3px;
   background: $color-bg-subtle;
@@ -92,17 +92,63 @@ body {
   &:hover {
     background: #eaeaea;
   }
+
+  &.active {
+    background: $color-accent;
+    border-color: $color-accent;
+    color: $color-bg;
+  }
 }
 
-#combine-toggle-btn {
-  margin-left: auto;
+#rail-footer {
+  flex-shrink: 0;
+  border-top: 1px solid $color-border;
+  padding: 6px 10px;
 }
 
-#combine-toggle-btn.active,
-#manage-toggle-btn.active {
-  background: $color-accent;
-  border-color: $color-accent;
-  color: $color-bg;
+#settings-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+#settings-menu {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  min-width: 120px;
+  flex-direction: column;
+  border: 1px solid $color-border;
+  border-radius: 4px;
+  background: $color-bg;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 1;
+
+  // Only laid out as a flex column when shown — its `hidden` attribute
+  // (toggled via settingsMenu.hidden in rail.ts) must keep winning the
+  // UA's `[hidden] { display: none }` default, which this rule would
+  // otherwise outrank by specificity.
+  &:not([hidden]) {
+    display: flex;
+  }
+
+  button {
+    font-size: $font-size-sm;
+    text-align: left;
+    padding: 6px 10px;
+    border: none;
+    background: $color-bg;
+    cursor: pointer;
+
+    &:hover {
+      background: $color-hover-bg;
+    }
+
+    &.active {
+      color: $color-accent;
+      font-weight: 600;
+    }
+  }
 }
 
 #rail-list {

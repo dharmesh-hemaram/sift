@@ -9,13 +9,35 @@
     <div id="app">
       <aside id="rail">
         <div id="rail-header">
-          <span>Captured responses</span>
+          <span>Responses</span>
           <span id="rail-count">0</span>
-          <button id="combine-toggle-btn" title="Combine multiple responses">Combine &#8908;</button>
-          <button id="manage-toggle-btn" title="Manage saved sifts">Manage</button>
-          <button id="clear-btn" title="Clear captured responses">Clear</button>
+          <button
+            id="clear-btn"
+            class="icon-btn"
+            title="Clear captured responses"
+            aria-label="Clear captured responses"
+          >
+            &#128465;
+          </button>
         </div>
         <ul id="rail-list"></ul>
+        <footer id="rail-footer">
+          <div id="settings-dropdown">
+            <button
+              id="settings-btn"
+              class="icon-btn"
+              title="Settings"
+              aria-label="Settings"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              &#9881;
+            </button>
+            <div id="settings-menu" hidden>
+              <button id="manage-toggle-btn" type="button">Manage</button>
+            </div>
+          </div>
+        </footer>
       </aside>
       <main id="main">
         <div id="empty-state">Reload the inspected page — captured JSON responses will appear on the left.</div>

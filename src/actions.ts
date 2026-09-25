@@ -63,9 +63,11 @@ export function clearAll(): void {
   scheduleRender();
 }
 
-// Shared toggle logic for the rail's "mode" buttons (Combine, Manage) —
-// clicking the active one goes back to the single-response view, clicking
-// the other one switches to it.
+// Shared toggle logic for the rail's "mode" views (Combine, Manage) —
+// switching to the active one goes back to the single-response view,
+// switching to the other one switches to it. Combine mode currently has no
+// UI entry point (its button was removed from the rail header pending a
+// new home) but the state/render path stays wired up.
 function setViewMode(mode: "combine" | "manage"): void {
   state.viewMode = state.viewMode === mode ? "single" : mode;
   scheduleRender();
